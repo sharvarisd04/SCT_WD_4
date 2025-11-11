@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Advanced To-Do App</title>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 0;
+    }
+
+    .todo-container {
+      background: #fff;
+      padding: 2rem;
+      border-radius: 1rem;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+      width: 400px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #4f46e5;
+      margin-bottom: 1.2rem;
+    }
+
+    .input-section {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .top-inputs {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    input[type="text"] {
+      flex: 1;
+      padding: 0.6rem;
+      border-radius: 0.5rem;
+      border: 2px solid #e5e7eb;
+      font-size: 1rem;
+      outline: none;
+    }
+
+    input[type="text"]:focus {
+      border-color: #6366f1;
+    }
+
+    input[type="date"],
+    input[type="time"] {
+      border: 2px solid #e5e7eb;
+      border-radius: 0.5rem;
+      padding: 0.4rem;
+      font-size: 0.9rem;
+      outline: none;
+    }
+
+    button {
+      background: #4f46e5;
+      color: #fff;
+      border: none;
+      border-radius: 0.5rem;
+      padding: 0.7rem;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    button:hover {
+      background: #4338ca;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin-top: 1rem;
+    }
+
+    li {
+      background: #f3f4f6;
+      padding: 0.7rem 1rem;
+      border-radius: 0.5rem;
+      margin-bottom: 0.6rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+      transition: background 0.2s ease;
+    }
+
+    li.completed {
+      text-decoration: line-through;
+      color: #9ca3af;
+      background: #e5e7eb;
+    }
+
+    .task-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .task-actions {
+      display: flex;
+      gap: 0.4rem;
+    }
+
+    .task-actions button {
+      font-size: 0.8rem;
+      padding: 0.3rem 0.6rem;
+    }
+
+    .edit-btn {
+      background: #60a5fa;
+    }
+
+    .edit-btn:hover {
+      background: #3b82f6;
+    }
+
+    .delete-btn {
+      background: #ef4444;
+    }
+
+    .delete-btn:hover {
+      background: #dc2626;
+    }
+
+    .done-btn {
+      background: #34d399;
+    }
+
+    .done-btn:hover {
+      background: #10b981;
+    }
+
+    .task-meta {
+      font-size: 0.85rem;
+      color: #6b7280;
+    }
+  </style>
+</head>
+<body>
+  <div class="todo-container">
+    <h1>🗓️ To-Do List</h1>
+
+    <div class="input-section">
+      <div class="top-inputs">
+        <input type="text" id="taskInput" placeholder="Enter task..." />
+        <button id="addBtn">Add</button>
+      </div>
+      <div class="datetime-inputs">
+        <input type="date" id="taskDate" />
+        <input type="time" id="taskTime" />
+      </div>
+    </div>
+
+    <ul id="taskList"></ul>
+  </div>
+
+  <script>
+    const taskInput = document.getElementById('taskInput');
+    const taskDate = document.getElementById('taskDate');
+    const taskTime = document.getElementById('taskTime');
+    const addBtn = document.getElementById('addBtn');
+    const taskList = document.getElementById('taskList');
+
+    // Add Task
+    addBtn.addEventListener('click', addTask);
+    taskInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') addTask();
+    });
+
+    function addTask() {
+      const text = taskInput.value.trim();
+      const date = taskDate.value;
+      const time = taskTime.value;
+
+      if (!text) {
+        alert('Please enter a task.');
+        return;
+      }
+
+      const li = document.createElement('li');
+
+      const taskTop = document.createElement('div');
+      taskTop.classList.add('task-top');
+
+      const span = document.createElement('span');
+      span.textContent = text;
+
+      const actions = document.createElement('div');
+      actions.classList.add('task-actions');
+
+      const doneBtn = document.createElement('button');
+      doneBtn.textContent = '✔';
+      doneBtn.classList.add('done-btn');
+      doneBtn.addEventListener('click', () => {
+        li.classList.toggle('completed');
+      });
+
+      const editBtn = document.createElement('button');
+      editBtn.textContent = '✎';
+      editBtn.classList.add('edit-btn');
+      editBtn.addEventListener('click', () => editTask(li, span, dateEl, timeEl));
+
+      const deleteBtn = document.createElement('button');
+      deleteBtn.textContent = '✕';
+      deleteBtn.classList.add('delete-btn');
+      deleteBtn.addEventListener('click', () => li.remove());
+
+      actions.append(doneBtn, editBtn, deleteBtn);
+
+      taskTop.append(span, actions);
+      li.appendChild(taskTop);
+
+      const dateEl = document.createElement('div');
+      dateEl.classList.add('task-meta');
+      dateEl.textContent = date ? `📅 ${date}` : '';
+
+      const timeEl = document.createElement('div');
+      timeEl.classList.add('task-meta');
+      timeEl.textContent = time ? `⏰ ${time}` : '';
+
+      li.append(dateEl, timeEl);
+      taskList.appendChild(li);
+
+      // Clear inputs
+      taskInput.value = '';
+      taskDate.value = '';
+      taskTime.value = '';
+    }
+
+    function editTask(li, span, dateEl, timeEl) {
+      const newText = prompt('Edit task:', span.textContent);
+      if (newText !== null && newText.trim() !== '') {
+        span.textContent = newText.trim();
+      }
+
+      const newDate = prompt('Edit date (YYYY-MM-DD):', dateEl.textContent.replace('📅 ', '').trim());
+      if (newDate !== null && newDate.trim() !== '') {
+        dateEl.textContent = `📅 ${newDate}`;
+      }
+
+      const newTime = prompt('Edit time (HH:MM):', timeEl.textContent.replace('⏰ ', '').trim());
+      if (newTime !== null && newTime.trim() !== '') {
+        timeEl.textContent = `⏰ ${newTime}`;
+      }
+    }
+  </script>
+</body>
+</html>
